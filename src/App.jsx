@@ -14,6 +14,39 @@ const TOTAL_SUPPLY = 1500;
 
 const IMAGES = ["/images/nft1.avif", "/images/nft2.avif", "/images/nft3.avif", "/images/nft4.avif"];
 
+const TEAM = [
+  {
+    name: "Evgeny",
+    role: "CEO",
+    img: "https://img-cdn.magiceden.dev/rs:fill:300:0:0/plain/https%3A%2F%2Fmedia.cdn.magiceden.dev%2Flaunchpad%2Fmeta_racing_pilots%2F473fd4ff-94fc-41da-86ea-458780053810",
+    x: null,
+  },
+  {
+    name: "Snowman",
+    role: "CMO",
+    img: "https://img-cdn.magiceden.dev/rs:fill:300:0:0/plain/https%3A%2F%2Fmedia.cdn.magiceden.dev%2Flaunchpad%2Fmeta_racing_pilots%2Faba4340f-7cf2-4f23-abf4-063ea3701012",
+    x: "https://x.com/sol_snowman",
+  },
+  {
+    name: "Myu",
+    role: "Content Lead",
+    img: "https://img-cdn.magiceden.dev/rs:fill:300:0:0/plain/https%3A%2F%2Fmedia.cdn.magiceden.dev%2Flaunchpad%2Fmeta_racing_pilots%2Fbc3558e2-e903-464a-bd75-3e83bb793335",
+    x: "https://x.com/meta_myu",
+  },
+  {
+    name: "Extreme",
+    role: "Community Mod",
+    img: "https://img-cdn.magiceden.dev/rs:fill:300:0:0/plain/https%3A%2F%2Fmedia.cdn.magiceden.dev%2Flaunchpad%2Fmeta_racing_pilots%2Fdb0f74fa-244f-491f-8891-5b0abc41a975",
+    x: "https://x.com/League0fgamess",
+  },
+  {
+    name: "OL",
+    role: "Partnership Lead",
+    img: "https://img-cdn.magiceden.dev/rs:fill:300:0:0/plain/https%3A%2F%2Fmedia.cdn.magiceden.dev%2Flaunchpad%2Fmeta_racing_pilots%2F82f863e6-69c6-4442-af30-9a945e990cc1",
+    x: "https://x.com/ol_onx",
+  },
+];
+
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -31,6 +64,7 @@ const CSS = `
   --bg: #100c18;
   --layer-01: #15111d;
   --panel: #1e1929;
+  --layer-03: #1b1624;
 
   --borderColor-primary: 35 30 47;
   --borderColor-interactive: 71 64 89/60%;
@@ -54,26 +88,26 @@ const CSS = `
   --sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
 
   --nav-h: 64px;
-  --nav-h-m: 48px;
-
   --nav-pad-x: 18px;
   --nav-pad-x-m: 12px;
-  --content-top-gap: 72px;
 
   --media-radius: 14px;
   --thumb-radius: 12px;
   --media-gap: 12px;
-  --thumb-size: 131px;
 
-  /* spacing around search */
-  --search-gap-left: 18px;
-  --search-gap-right: 18px;
+  --search-gap-left: 16px;
+  --search-gap-right: 16px;
+
+  --card-radius: 14px;
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
+*{ box-sizing:border-box; }
+html, body, #root { height: auto !important; min-height: 100%; }
+html { overflow-x:hidden; }
 body{
   margin:0;
+  overflow-x:hidden;
+  overflow-y:auto !important;
   font-family:var(--sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -83,20 +117,27 @@ body{
     radial-gradient(900px 550px at 80% 10%, rgb(120 90 255 / .10), transparent 60%),
     linear-gradient(180deg, var(--bg), var(--bg));
 }
+
 #root{ width:100%; max-width:none; margin:0; padding:0; }
 a{color:inherit; text-decoration:none}
 button{font-family:inherit}
-.page{min-height:100vh; width:100%;}
+.page{
+  min-height:100vh;
+  width:100%;
+  overflow: visible !important;
+  padding-top: var(--nav-h);
+}
 button, input { outline: none; }
 button:focus, button:focus-visible { outline: none; box-shadow: none; }
 input:focus, input:focus-visible { outline: none; box-shadow: none; }
 
 /* ===== NAVBAR ===== */
 .header{
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 300;
+  left: 0;
   width: 100%;
+  z-index: 9999;
 }
 .headerBar{
   height: var(--nav-h);
@@ -113,17 +154,19 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   height: 100%;
   display:flex;
   align-items:center;
-  gap: 16px;
+  justify-content: space-between;
+  gap: 12px;
   padding: 0 var(--nav-pad-x);
+  min-width: 0;
+  flex-wrap: nowrap;
 }
-
-/* left group */
 .navLeft{
   display:flex;
   align-items:center;
-  gap: 22px;          /* ✅ more even spacing between logo and links */
+  gap: 18px;
   height:100%;
   flex: 0 0 auto;
+  min-width: 0;
 }
 .logoWrap{
   display:flex;
@@ -132,33 +175,28 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   height:100%;
   flex: 0 0 auto;
 }
-
-/* ✅ original logo sizing */
 .meLogoSvg{
-  height: 16px;
-  width: 176px;
+  height: 18px;
+  width: 190px;
   display:block;
 }
 
-/* ✅ Play/Trade/Mint bigger + more balanced spacing */
 .navLinks{
   display:flex;
   align-items:center;
-  gap: 36px;          /* ✅ uniform spacing */
+  gap: 30px;
   height:100%;
 }
 .navLink{
-  font-weight: 900;
-  font-size: 14px;    /* ✅ slightly bigger */
-  opacity: .96;
+  font-weight: 800;
+  font-size: 13px;
+  opacity: .95;
   cursor: pointer;
   transition: opacity .15s ease;
   white-space: nowrap;
-  letter-spacing: .2px;
 }
 .navLink:hover{ opacity: .78; }
 
-/* search takes all free horizontal space */
 .navSearch{
   flex: 1;
   min-width: 0;
@@ -179,7 +217,6 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
 }
 .searchWrap:hover{ border-color: rgb(var(--borderColor-interactive-hover)); }
 .searchWrap:focus-within{ border-color: rgb(var(--borderColor-interactive-focus)); }
-
 .searchLeft{
   width: 36px;
   height: 40px;
@@ -190,7 +227,6 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   flex: 0 0 auto;
   color: rgb(var(--textColor-primary));
 }
-
 .searchInput{
   flex: 1;
   height: 40px;
@@ -201,8 +237,6 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   padding: 0 10px 0 0;
   min-width: 0;
 }
-
-/* ✅ Ctrl K: no borders, more right padding, perfectly aligned */
 .searchRight{
   height: 40px;
   display:flex;
@@ -211,15 +245,7 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   flex: 0 0 auto;
   padding-right: 12px;
 }
-
-.kbd{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap: 6px;
-  transform: translateY(.5px);
-}
-
+.kbd{ display:flex; align-items:center; justify-content:center; gap: 6px; transform: translateY(.5px); }
 .kbdKey{
   display:inline-flex;
   align-items:center;
@@ -235,12 +261,13 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   line-height: 1;
 }
 
-/* right group */
 .navRight{
   display:flex;
   align-items:center;
   gap: 10px;
   flex: 0 0 auto;
+  min-width: 0;
+  flex-wrap: nowrap;
 }
 
 .btnSecondary{
@@ -275,10 +302,19 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   cursor:pointer;
   transition: background .12s ease;
   min-width: 120px;
+  white-space: nowrap;
 }
 .btnPrimary:hover{ background: rgb(var(--button-primary-hover)); }
 .btnPrimary:active{ background: rgb(var(--button-primary-active)); }
 .btnPrimary:disabled{ background: rgb(var(--button-primary-disabled)); cursor:not-allowed; }
+
+.btnPrimaryMobile{
+  height: 36px;
+  min-width: 92px;
+  padding: 0 10px;
+  font-size: 12px;
+  border-radius: 8px;
+}
 
 .iconBtn{
   width: 40px;
@@ -292,13 +328,18 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   justify-content:center;
   cursor:pointer;
   transition: background .12s ease;
+  flex: 0 0 auto;
 }
 .iconBtn:hover{ background: rgb(var(--button-secondary-hover)); }
 .iconBtn:active{ background: rgb(var(--button-secondary-active)); }
 
-.mobileOnly{ display:none; }
-.desktopOnly{ display:flex; }
+.iconBtnSmall{
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
 
+/* dropdown menu */
 .mobileMenu{
   width: 100%;
   background: rgb(21 17 29 / 1);
@@ -321,20 +362,72 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
 }
 .mobileItem:hover{ background: rgb(var(--button-secondary-hover)); }
 
-/* ===== Layout ===== */
+/* search row (tablet+mobile toggle) */
+.mobileSearchRow{
+  width: 100%;
+  background: rgb(21 17 29 / 1);
+  border-bottom: 1px solid rgb(var(--borderColor-primary));
+  padding: 10px var(--nav-pad-x-m) 12px;
+}
+.mobileSearchWrap{
+  width: 100%;
+  height: 40px;
+  display:flex;
+  align-items:center;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgb(var(--borderColor-interactive));
+  overflow:hidden;
+}
+.mobileSearchInput{
+  flex: 1;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: rgb(var(--textColor-primary));
+  font-size: 13px;
+  padding: 0 12px;
+}
+
+/* ===== Page Layout ===== */
 .shell{
   max-width: 1240px;
   margin: 0 auto;
-  padding: var(--content-top-gap) 18px 44px;
+  padding: 22px 18px 44px;
 }
 
-.topRow{
+.iconGhost{
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgb(var(--textColor-primary)); /* цвет самой лупы */
+  flex: 0 0 auto;
+}
+
+.iconGhost:hover{
+  background: rgba(255,255,255,.06); /* лёгкий hover, можно убрать */
+}
+
+.iconGhost:active{
+  background: rgba(255,255,255,.10);
+}
+
+.heroRow{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
-.topLeft{
+.heroLeft{
   display:flex;
   align-items:center;
   gap: 12px;
@@ -355,29 +448,47 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
+}
+.heroRight{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.heroIcons{
+  display:flex;
+  gap: 12px;
 }
 
 .mainGrid{
+  margin-top: 16px;
   display:grid;
   grid-template-columns: 1.1fr .9fr;
   gap: 22px;
   align-items:start;
+  width: 100%;
+  min-width: 0;
 }
 
 /* ===== MEDIA ===== */
-.mediaCard{ background: transparent; border: none; box-shadow: none; border-radius: 0; overflow: visible; }
-.mediaWrap{ width: 580px; max-width: 100%; margin: 0 auto; }
+.mediaCard{ background: transparent; border: none; box-shadow: none; border-radius: 0; overflow: visible; min-width:0; }
+.mediaWrap{
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
+}
 .mediaMain{
   position: relative;
   width: 100%;
-  height: 580px;
+  aspect-ratio: 1 / 1;
   display:flex;
   align-items:center;
   justify-content:center;
 }
 .mainImg{
   width: 100%;
-  height: 580px;
+  height: 100%;
   object-fit: contain;
   object-position: center;
   background: transparent;
@@ -399,20 +510,18 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   color: rgba(236,234,247,.9);
 }
 
-/* thumbs 131x131 filled */
+/* thumbs */
 .thumbRow{
   width: 100%;
   display:grid;
-  grid-template-columns: repeat(4, var(--thumb-size));
-  justify-content: space-between;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--media-gap);
   margin-top: var(--media-gap);
   padding: 0;
-  overflow: hidden;
 }
 .thumbBtn{
-  width: var(--thumb-size);
-  height: var(--thumb-size);
+  width: 100%;
+  aspect-ratio: 1 / 1;
   border-radius: var(--thumb-radius);
   border: none;
   background: transparent;
@@ -436,15 +545,108 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   object-position: center;
 }
 
-/* panel */
+/* ===== LEFT DESCRIPTION ===== */
+.descWrap{
+  width: 100%;
+  max-width: 580px;
+  margin: 18px auto 0;
+  display:flex;
+  flex-direction:column;
+  gap: 14px;
+}
+.layerBox{
+  background: rgb(21 17 29 / 1);
+  border: 1px solid rgb(var(--borderColor-primary));
+  border-radius: 14px;
+  box-shadow: 0 10px 40px rgb(0 0 0 / .28);
+  overflow:hidden;
+}
+.layerBoxInner{ padding: 14px; }
+
+.sectionTitle{
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: .2px;
+  margin: 4px 0 10px;
+}
+.divider{
+  height: 1px;
+  background: rgb(var(--borderColor-primary));
+  margin: 12px 0 14px;
+}
+
+.p{
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0 0 12px 0;
+  color: rgba(242,242,243,.82);
+}
+.p:last-child{ margin-bottom: 0; }
+.brandStrong{ color: rgb(var(--brand)); font-weight: 900; }
+
+.list{ margin: 8px 0 12px 18px; padding: 0; }
+.li{ font-size: 13px; line-height: 1.55; margin: 6px 0; color: rgba(242,242,243,.80); }
+
+.h3{ margin: 10px 0 8px; font-size: 16px; font-weight: 900; color: rgba(242,242,243,.92); }
+
+/* team grid */
+.teamGrid{
+  display:grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (min-width: 560px){
+  .teamGrid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.teamCard{
+  background: rgb(21 17 29 / 1);
+  border: 1px solid rgb(var(--borderColor-primary));
+  border-radius: 12px;
+  overflow:hidden;
+}
+.teamImgWrap{ width: 100%; aspect-ratio: 1 / 1; background: rgba(255,255,255,.04); }
+.teamImg{ width: 100%; height: 100%; object-fit: cover; display:block; }
+.teamBody{
+  padding: 10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-between;
+  gap: 8px;
+  min-height: 84px;
+}
+.teamName{ font-weight: 900; font-size: 13px; color: rgba(242,242,243,.92); text-align:center; }
+.teamRole{ font-weight: 700; font-size: 11px; color: rgba(133,127,148,.95); text-align:center; }
+.teamLinks{ height: 18px; display:flex; align-items:center; justify-content:center; }
+.xLink{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgb(var(--borderColor-interactive));
+  transition: opacity .12s ease, background .12s ease;
+}
+.xLink:hover{ opacity: .85; background: rgba(255,255,255,.07); }
+.xIcon{ display:block; }
+
+/* ===== Mint panel ===== */
 .panel{
   background: var(--panel);
   border: 1px solid rgb(var(--borderColor-primary));
   border-radius: 16px;
   box-shadow: var(--shadow);
   overflow:hidden;
+  position: sticky;
+  top: calc(var(--nav-h) + 16px);
 }
 .panelInner{ padding: 18px; }
+
+.mintDesktop{ display:block; }
+.mintMobile{ display:none; margin-top: 18px; max-width: 580px; margin-left:auto; margin-right:auto; }
+.panelMobile{ position: static; top: auto; }
 
 .metaRow{
   display:flex;
@@ -501,17 +703,8 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   justify-content:space-between;
   gap: 10px;
 }
-.mintedTop{
-  font-size: 12px;
-  color: rgba(133,127,148,.90);
-  font-weight: 600;
-}
-.mintedNums{
-  font-size: 12px;
-  color: rgba(242,242,243,.86);
-  font-weight: 900;
-  white-space: nowrap;
-}
+.mintedTop{ font-size: 12px; color: rgba(133,127,148,.90); font-weight: 600; }
+.mintedNums{ font-size: 12px; color: rgba(242,242,243,.86); font-weight: 900; white-space: nowrap; }
 .mintedBar{
   width: 100%;
   height: 6px;
@@ -533,17 +726,8 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   gap: 14px;
   margin-top: 10px;
 }
-.priceBlock .label{
-  font-size: 14px;
-  color: rgba(242,242,243,.76);
-  font-weight: 900;
-}
-.priceBlock .priceLine{
-  display:flex;
-  align-items:baseline;
-  gap: 10px;
-  margin-top: 6px;
-}
+.priceBlock .label{ font-size: 14px; color: rgba(242,242,243,.76); font-weight: 900; }
+.priceBlock .priceLine{ display:flex; align-items:baseline; gap: 10px; margin-top: 6px; }
 .priceBig{ font-size: 28px; font-weight: 900; }
 .usd{ font-size: 13px; color: rgba(133,127,148,.90); font-weight: 700; }
 
@@ -683,36 +867,33 @@ input:focus, input:focus-visible { outline: none; box-shadow: none; }
   font-size: 12px;
 }
 
-/* Responsive */
+/* responsive layout */
 @media (max-width: 1050px){
   .mainGrid{ grid-template-columns: 1fr; }
-  .mediaWrap{ width: 520px; }
-  .mediaMain{ height: 520px; }
-  .mainImg{ height: 520px; }
-  :root{ --thumb-size: 118px; }
+  .panel{ position: static; top: auto; }
+  .mintedBox{ min-width: 0; }
+  .mintDesktop{ display:none; }
+  .mintMobile{ display:block; }
 }
 
-@media (max-width: 860px){
-  .headerBar{ height: var(--nav-h-m); min-height: var(--nav-h-m); }
-  .nav{ padding: 0 var(--nav-pad-x-m); }
-  .navLinks{ display:none; }
-  .navSearch{ display:none; }
-  .desktopOnly{ display:none; }
-  .mobileOnly{ display:flex; }
-  :root{ --content-top-gap: 56px; --thumb-size: 96px; }
-
-  .mediaWrap{ width: 420px; }
-  .mediaMain{ height: 420px; }
-  .mainImg{ height: 420px; }
+/* tablet sizing */
+@media (max-width: 1024px){
+  :root{ --nav-h: 56px; }
+  .page{ padding-top: var(--nav-h); }
+  .headerBar{ height: var(--nav-h); min-height: var(--nav-h); }
+  .meLogoSvg{ width: 160px; }
+  .btnSecondary{ height: 38px; padding: 0 12px; }
+  .btnPrimary{ height: 38px; min-width: 110px; padding: 0 12px; font-size: 12px; }
+  .iconBtn{ width: 38px; height: 38px; }
 }
 
+/* phone sizing */
 @media (max-width: 640px){
-  :root{ --thumb-size: 72px; }
-  .mediaWrap{ width: 320px; }
-  .mediaMain{ height: 340px; }
-  .mainImg{ height: 320px; }
-  .title{ font-size: 24px; }
-  .mintedBox{ min-width: 200px; }
+  :root{ --nav-h: 48px; }
+  .page{ padding-top: var(--nav-h); }
+  .headerBar{ height: var(--nav-h); min-height: var(--nav-h); }
+  .nav{ padding: 0 var(--nav-pad-x-m); gap: 8px; }
+  .meLogoSvg{ width: 145px; }
 }
 `;
 
@@ -740,8 +921,18 @@ function SearchIcon() {
   );
 }
 
+function XIcon() {
+  return (
+    <svg className="xIcon" viewBox="0 0 20 21" fill="none" width="16" height="16" aria-hidden="true">
+      <path
+        d="M11.3032 9.42806L16.4029 3.5H15.1945L10.7663 8.64725L7.2296 3.5H3.15039L8.49863 11.2836L3.15039 17.5H4.35894L9.03516 12.0644L12.7702 17.5H16.8494L11.3029 9.42806H11.3032ZM9.6479 11.3521L9.10601 10.5771L4.7944 4.40978H6.65066L10.1302 9.38698L10.6721 10.162L15.195 16.6316H13.3388L9.6479 11.3524V11.3521Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 function MagicEdenLogo() {
-  // ✅ Original logo (paths), adapted for JSX
   return (
     <svg
       viewBox="0 0 176 20"
@@ -755,42 +946,17 @@ function MagicEdenLogo() {
         d="M23.5949 5.09192L25.5453 7.38358C25.7686 7.64098 25.9666 7.85271 26.0467 7.97311C26.63 8.55281 26.957 9.33628 26.9566 10.1527C26.9018 11.1158 26.2741 11.7718 25.6928 12.4734L24.3279 14.0759L23.616 14.9062C23.5904 14.9349 23.574 14.9702 23.5686 15.008C23.5632 15.0458 23.5692 15.0842 23.5858 15.1187C23.6024 15.1531 23.6288 15.182 23.6619 15.2018C23.695 15.2216 23.7332 15.2314 23.7718 15.2301H30.887C31.9738 15.2301 33.3429 16.1434 33.2629 17.53C33.2607 18.1603 33.0056 18.7641 32.5534 19.2097C32.1012 19.6554 31.4885 19.9067 30.849 19.9089H19.7067C18.9737 19.9089 17.0021 19.9878 16.4503 18.3064C16.3329 17.955 16.3169 17.5785 16.404 17.2187C16.5644 16.6866 16.8181 16.1864 17.1538 15.7407C17.7141 14.9104 18.3207 14.0801 18.9189 13.2747C19.6898 12.2202 20.4818 11.1989 21.2611 10.1236C21.2888 10.0886 21.3038 10.0455 21.3038 10.0011C21.3038 9.95678 21.2888 9.91368 21.2611 9.87868L18.4302 6.55742C18.4118 6.53334 18.3879 6.51381 18.3605 6.50037C18.3331 6.48692 18.3029 6.47992 18.2723 6.47992C18.2416 6.47992 18.2114 6.48692 18.184 6.50037C18.1566 6.51381 18.1327 6.53334 18.1143 6.55742C17.356 7.56625 14.0365 12.0333 13.3287 12.9384C12.621 13.8434 10.877 13.8932 9.9123 12.9384L5.48484 8.55848C5.45655 8.53051 5.42048 8.51145 5.38119 8.50372C5.3419 8.49599 5.30117 8.49994 5.26416 8.51506C5.22715 8.53019 5.19553 8.5558 5.17332 8.58866C5.15111 8.62152 5.1393 8.66015 5.1394 8.69963V17.1232C5.14982 17.7209 4.97021 18.3069 4.62573 18.799C4.28125 19.2911 3.78917 19.6647 3.21844 19.8674C2.85377 19.9924 2.46403 20.0298 2.08173 19.9763C1.69943 19.9228 1.33565 19.78 1.02071 19.5598C0.70578 19.3396 0.448823 19.0484 0.271268 18.7105C0.0937132 18.3726 0.000705322 17.9977 0 17.6172V2.47228C0.0253814 1.92649 0.224654 1.40247 0.569503 0.974675C0.914352 0.546881 1.38723 0.237072 1.92096 0.0892728C2.37877 -0.0309286 2.8607 -0.0297259 3.31789 0.0927586C3.77508 0.215243 4.1913 0.454656 4.52436 0.786737L11.332 7.50398C11.3523 7.52438 11.377 7.54012 11.4042 7.55008C11.4315 7.56003 11.4606 7.56396 11.4895 7.56158C11.5185 7.55921 11.5465 7.55058 11.5717 7.53632C11.5969 7.52206 11.6186 7.50252 11.6353 7.47907L16.4714 0.882224C16.6948 0.614417 16.975 0.397995 17.2923 0.248114C17.6096 0.0982325 17.9562 0.0185155 18.3081 0.0145452H30.887C31.2312 0.0151045 31.5714 0.0880957 31.8847 0.228638C32.198 0.369181 32.4773 0.574035 32.7038 0.829499C32.9303 1.08496 33.0988 1.38515 33.1982 1.70998C33.2975 2.03481 33.3253 2.37679 33.2797 2.71307C33.1911 3.2964 32.8908 3.82825 32.4345 4.20997C31.9782 4.59169 31.3969 4.79737 30.7985 4.78885H23.755C23.7196 4.7897 23.6851 4.79989 23.655 4.81835C23.625 4.83681 23.6005 4.86287 23.5842 4.89382C23.5678 4.92477 23.5602 4.95947 23.5621 4.99431C23.564 5.02915 23.5753 5.06286 23.5949 5.09192Z"
         fill="rgb(var(--brand))"
       />
-      <path
-        d="M129.893 13.9547H126.424C126.156 13.9479 125.9 13.8398 125.71 13.6527C125.52 13.4655 125.411 13.2137 125.404 12.9491V12.1446C125.411 11.8801 125.52 11.6282 125.71 11.4411C125.9 11.254 126.156 11.1458 126.424 11.1391H129.39C129.661 11.1391 129.92 11.0331 130.112 10.8445C130.303 10.6559 130.41 10.4002 130.41 10.1335C130.41 9.86678 130.303 9.611 130.112 9.42242C129.92 9.23383 129.661 9.12789 129.39 9.12789H126.397C126.128 9.1211 125.873 9.01298 125.683 8.82584C125.493 8.63871 125.383 8.38686 125.376 8.1223V7.31783C125.383 7.05327 125.493 6.80142 125.683 6.61429C125.873 6.42716 126.128 6.31903 126.397 6.31224H129.798C130.069 6.31224 130.328 6.2063 130.52 6.01772C130.711 5.82913 130.819 5.57336 130.819 5.30666C130.819 5.03996 130.711 4.78418 130.52 4.5956C130.328 4.40702 130.069 4.30107 129.798 4.30107H125.717C125.557 4.29791 125.402 4.34985 125.278 4.44784C125.154 4.54583 125.068 4.68368 125.036 4.83738L122.859 14.9603V15.1614C122.898 15.3964 123.024 15.6089 123.212 15.7576C123.401 15.9063 123.639 15.9806 123.88 15.9659H129.866C130.137 15.9659 130.396 15.8599 130.588 15.6713C130.779 15.4828 130.887 15.227 130.887 14.9603C130.887 14.6936 130.779 14.4378 130.588 14.2492C130.396 14.0606 130.137 13.9547 129.866 13.9547H129.893Z"
+      <text
+        x="40"
+        y="14"
         fill="rgb(var(--textColor-primary))"
-      />
-      <path
-        d="M54.384 4.36811H53.0234C52.8233 4.37061 52.6278 4.42851 52.4595 4.53519C52.2911 4.64187 52.1565 4.79304 52.0711 4.97146L49.0779 12.0776C49.0779 12.0954 49.0707 12.1124 49.058 12.125C49.0452 12.1376 49.0279 12.1446 49.0099 12.1446C48.9419 12.1446 48.9419 12.1446 48.9419 12.0776L45.9487 4.97146C45.8757 4.79012 45.759 4.62904 45.6086 4.50219C45.3365 4.30107 44.9963 4.56923 44.9283 4.90443L42.6834 15.1614C42.6657 15.2775 42.6897 15.3961 42.7514 15.4966C42.833 15.6587 42.9592 15.7949 43.1156 15.8897C43.2719 15.9846 43.4522 16.0342 43.6358 16.0329H44.044C44.3076 16.0195 44.5564 15.9084 44.7406 15.722C44.9247 15.5355 45.0306 15.2874 45.0371 15.0273V8.4575C45.0371 8.43972 45.0443 8.42267 45.0571 8.41009C45.0698 8.39752 45.0871 8.39046 45.1052 8.39046C45.1232 8.39046 45.1405 8.39752 45.1533 8.41009C45.166 8.42267 45.1732 8.43972 45.1732 8.4575L47.9623 15.3625C48.0364 15.5491 48.1684 15.7078 48.3394 15.8161C48.5104 15.9244 48.7117 15.9769 48.9146 15.9659H49.1868C49.3869 15.9634 49.5823 15.9055 49.7507 15.7988C49.9191 15.6921 50.0537 15.5409 50.1391 15.3625L52.9282 8.52454C52.9282 8.50676 52.9354 8.48971 52.9481 8.47713C52.9609 8.46456 52.9782 8.4575 52.9962 8.4575C53.0143 8.4575 53.0316 8.46456 53.0443 8.47713C53.0571 8.48971 53.0643 8.50676 53.0643 8.52454V15.0273C53.0711 15.2919 53.1809 15.5437 53.3708 15.7309C53.5606 15.918 53.8162 16.0261 54.0847 16.0329H54.4928C54.7613 16.0261 55.0168 15.918 55.2067 15.7309C55.3966 15.5437 55.5063 15.2919 55.5132 15.0273V5.3737C55.4666 5.10561 55.3299 4.86073 55.1251 4.67837C54.9203 4.49601 54.6593 4.38674 54.384 4.36811Z"
-        fill="rgb(var(--textColor-primary))"
-      />
-      <path
-        d="M85.5401 9.79828H82.5469C82.2943 9.79828 82.0521 9.89716 81.8735 10.0732C81.6949 10.2492 81.5946 10.4879 81.5946 10.7368C81.5946 10.9857 81.6949 11.2245 81.8735 11.4005C82.0521 11.5765 82.2943 11.6754 82.5469 11.6754H83.0911C83.6354 11.6754 84.1796 12.1446 83.9075 12.681C83.4993 13.5525 82.683 14.0217 81.3905 14.0217C79.4857 14.0217 78.3293 12.6139 78.3293 10.2005C78.3293 7.7871 79.5538 6.37928 81.3905 6.37928C81.8164 6.35758 82.2408 6.44497 82.6223 6.63295C83.0038 6.82092 83.3294 7.10307 83.5673 7.45191C83.6738 7.64739 83.8302 7.81207 84.0211 7.92966C84.212 8.04724 84.4308 8.11365 84.6557 8.1223H85.268C85.4056 8.13332 85.5439 8.11114 85.6709 8.05768C85.7979 8.00423 85.9097 7.9211 85.9968 7.81549C86.0839 7.70988 86.1435 7.58496 86.1706 7.45153C86.1977 7.3181 86.1914 7.18017 86.1523 7.04967C85.7277 6.17073 85.0494 5.43477 84.2024 4.93393C83.3554 4.43309 82.3772 4.18963 81.3905 4.23403C78.2613 4.23403 75.8803 6.44632 75.8803 10.2005C75.8803 13.9547 78.1252 16.167 81.4585 16.167C84.4517 16.167 86.5605 14.2899 86.5605 11.2731V10.8039C86.5633 10.6711 86.5388 10.5391 86.4885 10.4158C86.4382 10.2926 86.3631 10.1806 86.2678 10.0867C86.1725 9.99278 86.0589 9.91881 85.9338 9.86924C85.8088 9.81967 85.6748 9.79554 85.5401 9.79828Z"
-        fill="rgb(var(--textColor-primary))"
-      />
-      <path
-        d="M67.8532 5.0385C67.7834 4.84397 67.6546 4.6753 67.4843 4.55538C67.3139 4.43545 67.1102 4.37007 66.9008 4.36811H65.1322C64.9228 4.37007 64.7191 4.43545 64.5487 4.55538C64.3784 4.6753 64.2496 4.84397 64.1798 5.0385L60.7785 14.6921C60.7274 14.8431 60.713 15.0036 60.7362 15.1611C60.7595 15.3185 60.8198 15.4683 60.9123 15.5987C61.0049 15.729 61.1271 15.8361 61.2693 15.9115C61.4114 15.987 61.5695 16.0285 61.7308 16.0329H62.2751C62.4844 16.031 62.6881 15.9656 62.8585 15.8457C63.0288 15.7257 63.1576 15.5571 63.2274 15.3625L63.6356 14.0888C63.7054 13.8942 63.8342 13.7256 64.0045 13.6057C64.1749 13.4857 64.3786 13.4203 64.588 13.4184H67.377C67.5864 13.4203 67.7901 13.4857 67.9604 13.6057C68.1308 13.7256 68.2596 13.8942 68.3294 14.0888L68.7376 15.3625C68.8073 15.5571 68.9362 15.7257 69.1065 15.8457C69.2769 15.9656 69.4806 16.031 69.6899 16.0329H70.2341C70.3955 16.0285 70.5536 15.987 70.6957 15.9115C70.8378 15.8361 70.9601 15.729 71.0526 15.5987C71.1452 15.4683 71.2055 15.3185 71.2288 15.1611C71.252 15.0036 71.2376 14.8431 71.1865 14.6921L67.8532 5.0385ZM66.1253 11.4072H65.9213C65.7599 11.4028 65.6018 11.3613 65.4597 11.2858C65.3176 11.2104 65.1953 11.1033 65.1028 10.973C65.0102 10.8426 64.9499 10.6928 64.9266 10.5354C64.9034 10.3779 64.9179 10.2174 64.9689 10.0664L65.9893 6.98264C65.9893 6.96486 65.9965 6.94781 66.0092 6.93523C66.022 6.92266 66.0393 6.9156 66.0573 6.9156C66.0754 6.9156 66.0927 6.92266 66.1054 6.93523C66.1182 6.94781 66.1253 6.96486 66.1253 6.98264L67.1457 10.0664C67.1828 10.222 67.1847 10.3837 67.1515 10.5401C67.1182 10.6965 67.0506 10.8438 66.9533 10.9717C66.856 11.0995 66.7314 11.2048 66.5884 11.28C66.4453 11.3553 66.2873 11.3987 66.1253 11.4072Z"
-        fill="rgb(var(--textColor-primary))"
-      />
-      <path
-        d="M93.4312 4.36811H92.955C92.6865 4.3749 92.431 4.48302 92.2411 4.67016C92.0512 4.85729 91.9415 5.10914 91.9346 5.3737V15.0273C91.9415 15.2919 92.0512 15.5437 92.2411 15.7309C92.431 15.918 92.6865 16.0261 92.955 16.0329H93.4312C93.6996 16.0261 93.9552 15.918 94.1451 15.7309C94.335 15.5437 94.4447 15.2919 94.4516 15.0273V5.3737C94.434 5.11269 94.3209 4.86685 94.1332 4.68188C93.9455 4.49691 93.696 4.38541 93.4312 4.36811Z"
-        fill="rgb(var(--textColor-primary))"
-      />
-      <path
-        d="M105.336 6.37928C105.794 6.36689 106.248 6.47148 106.653 6.68291C107.059 6.89435 107.401 7.20544 107.649 7.58599C107.737 7.81943 107.894 8.02121 108.1 8.1648C108.307 8.30838 108.553 8.38705 108.805 8.39046H109.281C109.419 8.40147 109.557 8.37929 109.684 8.32584C109.811 8.27238 109.923 8.18926 110.01 8.08365C110.097 7.97804 110.157 7.85312 110.184 7.71969C110.211 7.58626 110.205 7.44833 110.166 7.31783C109.485 5.30666 107.649 4.16699 105.268 4.16699C102.139 4.16699 99.7576 6.31224 99.7576 10.1335C99.7576 13.9547 102.071 16.1 105.268 16.1C107.785 16.1 109.485 14.7592 110.098 13.0832C110.137 12.9527 110.143 12.8148 110.116 12.6813C110.089 12.5479 110.029 12.423 109.942 12.3174C109.855 12.2118 109.743 12.1286 109.616 12.0752C109.489 12.0217 109.351 11.9996 109.213 12.0106H108.669C108.421 12.0321 108.184 12.1179 107.981 12.2592C107.778 12.4005 107.616 12.5923 107.513 12.815C107.286 13.1989 106.957 13.5143 106.561 13.727C106.165 13.9398 105.718 14.0417 105.268 14.0217C103.499 14.0217 102.275 12.681 102.275 10.2005C102.275 7.72006 103.499 6.37928 105.336 6.37928Z"
-        fill="rgb(var(--textColor-primary))"
-      />
-      <path
-        d="M140.574 4.36811H137.376C137.108 4.3749 136.852 4.48302 136.662 4.67016C136.472 4.85729 136.363 5.10914 136.356 5.3737V15.0273C136.363 15.2919 136.472 15.5437 136.662 15.7309C136.852 15.918 137.108 16.0261 137.376 16.0329H140.574C144.179 16.0329 146.356 13.8206 146.356 10.2005C146.356 6.5804 144.111 4.36811 140.574 4.36811ZM140.437 13.8877H139.893C139.625 13.8809 139.369 13.7728 139.179 13.5856C138.989 13.3985 138.88 13.1466 138.873 12.8821V7.45191C138.88 7.18735 138.989 6.9355 139.179 6.74837C139.369 6.56124 139.625 6.45311 139.893 6.44633H140.437C142.682 6.44633 143.839 7.58599 143.839 10.1335C143.839 12.681 142.682 13.8877 140.437 13.8877Z"
-        fill="rgb(var(--textColor-primary))"
-      />
-      <path
-        d="M158.601 13.9547H155.131C154.863 13.9479 154.607 13.8398 154.417 13.6527C154.227 13.4655 154.118 13.2137 154.111 12.9491V12.1446C154.118 11.8801 154.227 11.6282 154.417 11.4411C154.607 11.254 154.863 11.1458 155.131 11.1391H158.124C158.395 11.1391 158.655 11.0331 158.846 10.8445C159.037 10.6559 159.145 10.4002 159.145 10.1335C159.145 9.86677 159.037 9.611 158.846 9.42241C158.655 9.23383 158.395 9.12788 158.124 9.12788H155.131C154.863 9.1211 154.607 9.01297 154.417 8.82584C154.227 8.63871 154.118 8.38686 154.111 8.1223V7.31783C154.118 7.05327 154.227 6.80142 154.417 6.61429C154.607 6.42715 154.863 6.31903 155.131 6.31224H158.533C158.803 6.31224 159.063 6.2063 159.254 6.01771C159.445 5.82913 159.553 5.57335 159.553 5.30665C159.553 5.03996 159.445 4.78418 159.254 4.5956C159.063 4.40701 158.803 4.30107 158.533 4.30107H152.614C152.346 4.30785 152.09 4.41598 151.9 4.60311C151.71 4.79025 151.601 5.0421 151.594 5.30665V14.9603C151.601 15.2248 151.71 15.4767 151.9 15.6638C152.09 15.851 152.346 15.9591 152.614 15.9659H158.601C158.869 15.9591 159.125 15.851 159.314 15.6638C159.504 15.4767 159.614 15.2248 159.621 14.9603C159.624 14.8275 159.599 14.6955 159.549 14.5722C159.499 14.449 159.424 14.3371 159.328 14.2431C159.233 14.1492 159.119 14.0752 158.994 14.0257C158.869 13.9761 158.735 13.952 158.601 13.9547Z"
-        fill="rgb(var(--textColor-primary))"
-      />
-      <path
-        d="M173.975 4.36811H173.498C173.23 4.3749 172.974 4.48302 172.784 4.67016C172.595 4.85729 172.485 5.10914 172.478 5.3737V11.6083C172.478 11.6754 172.478 11.6754 172.41 11.6754H172.342L167.58 4.83739C167.488 4.70966 167.365 4.6062 167.223 4.53607C167.08 4.46594 166.923 4.43129 166.764 4.43515H166.124C165.856 4.44194 165.6 4.55006 165.41 4.7372C165.22 4.92433 165.111 5.17618 165.104 5.44074V15.0944C165.111 15.3589 165.22 15.6108 165.41 15.7979C165.6 15.985 165.856 16.0932 166.124 16.1H166.6C166.869 16.0932 167.124 15.985 167.314 15.7979C167.504 15.6108 167.614 15.3589 167.621 15.0944V8.79269C167.621 8.77491 167.628 8.75786 167.641 8.74529C167.654 8.73272 167.671 8.72565 167.689 8.72565H167.757L172.587 15.5636C172.679 15.6914 172.802 15.7948 172.944 15.865C173.086 15.9351 173.244 15.9697 173.403 15.9659H174.015C174.284 15.9591 174.539 15.851 174.729 15.6638C174.919 15.4767 175.029 15.2249 175.036 14.9603V5.30666C174.99 5.05635 174.86 4.82828 174.668 4.65836C174.476 4.48844 174.232 4.38633 173.975 4.36811Z"
-        fill="rgb(var(--textColor-primary))"
-      />
+        fontFamily="Inter, sans-serif"
+        fontWeight="800"
+        fontSize="12"
+        letterSpacing=".2"
+      >
+        MAGIC EDEN
+      </text>
     </svg>
   );
 }
@@ -804,7 +970,35 @@ export default function App() {
   const [chainId, setChainId] = useState(null);
   const [accepted, setAccepted] = useState(false);
   const [activeThumb, setActiveThumb] = useState(0);
+
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchRowOpen, setSearchRowOpen] = useState(false);
+
+  // === breakpoint mode (JS, to avoid CSS "leaks") ===
+  const [mode, setMode] = useState(() => {
+    const w = typeof window !== "undefined" ? window.innerWidth : 1200;
+    if (w <= 640) return "mobile";
+    if (w <= 1024) return "tablet";
+    return "desktop";
+  });
+
+  useEffect(() => {
+    const onResize = () => {
+      const w = window.innerWidth;
+      const next = w <= 640 ? "mobile" : w <= 1024 ? "tablet" : "desktop";
+      setMode(next);
+
+      // prevent stuck dropdowns after crossing breakpoints
+      setMenuOpen(false);
+      setSearchRowOpen(false);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  const isMobile = mode === "mobile";
+  const isTablet = mode === "tablet";
+  const isDesktop = mode === "desktop";
 
   const itemWei = useMemo(() => parseEther(PRICE_PER_ITEM_ETH), []);
   const totalWei = useMemo(() => itemWei * BigInt(qty), [itemWei, qty]);
@@ -856,9 +1050,7 @@ export default function App() {
       setTxHash(null);
 
       if (!window.ethereum) {
-        throw new Error(
-          "Wallet не найден. Открой в браузере с MetaMask (не во встроенном preview) и установи расширение."
-        );
+        throw new Error("Wallet не найден. Открой в браузере с MetaMask и установи расширение.");
       }
 
       const provider = new BrowserProvider(window.ethereum);
@@ -950,6 +1142,219 @@ export default function App() {
 
   const canMint = !!account && isSepolia && accepted && status !== "sending";
 
+  const MintPanel = ({ mobile = false }) => (
+    <div className={`panel ${mobile ? "panelMobile" : ""}`}>
+      <div className="panelInner">
+        <div className="metaRow">
+          <div className="metaLeft">
+            <div className="metaLine">
+              <div className="eligPill">
+                {!eligible && <span className="lockIcon">🔒</span>}
+                {eligible ? "Eligible" : "Not Eligible"}
+              </div>
+
+              <div className="publicRow">
+                <span className="greenDot" />
+                <span>Public</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mintedBox">
+            <div className="mintedHeader">
+              <div className="mintedTop">Total minted</div>
+              <div className="mintedNums">
+                {TOTAL_MINTED_PERCENT}%&nbsp;&nbsp; {TOTAL_MINTED} / {TOTAL_SUPPLY}
+              </div>
+            </div>
+
+            <div className="mintedBar" aria-label="minted progress" style={{ ["--pct"]: `${TOTAL_MINTED_PERCENT}%` }}>
+              <div className="mintedFill" />
+            </div>
+          </div>
+        </div>
+
+        <div className="rowTop">
+          <div className="priceBlock">
+            <div className="label">Price</div>
+            <div className="priceLine">
+              <div className="priceBig">{PRICE_PER_ITEM_ETH} ETH</div>
+              <div className="usd">(test)</div>
+            </div>
+          </div>
+
+          <div className="stepper">
+            <button className="stepBtn" onClick={() => setQty((v) => Math.max(1, Number(v) - 1))} disabled={qty <= 1}>
+              −
+            </button>
+            <div className="stepVal">{qty}</div>
+            <button className="stepBtn" onClick={() => setQty((v) => Math.min(20, Number(v) + 1))} disabled={qty >= 20}>
+              +
+            </button>
+          </div>
+        </div>
+
+        <div className="fees">
+          <div>Mint fee</div>
+          <div className="r">{mintFeeEth} ETH</div>
+
+          <div>Protocol fee</div>
+          <div className="r">{protocolFeeEth} ETH</div>
+
+          <div>
+            Priority fee <span className="smallLink">(Standard)</span>
+          </div>
+          <div className="r">—</div>
+
+          <div style={{ marginTop: 6, color: "rgb(var(--textColor-secondary) / .85)" }}>Subtotal</div>
+          <div style={{ marginTop: 6 }} className="r">
+            {formatEther(totalWei)} ETH
+          </div>
+        </div>
+
+        <div className="terms">
+          <input className="cb" type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
+          <div>
+            By clicking "mint", you agree to the Magic Eden Terms of Service.
+            <div style={{ marginTop: 6, color: "rgb(var(--textColor-secondary) / .85)" }}>
+              Network:{" "}
+              {isSepolia ? (
+                <b style={{ color: "rgb(var(--textColor-primary) / .92)" }}>Sepolia</b>
+              ) : (
+                <b style={{ color: "rgb(var(--textColor-attention))" }}>Wrong / Not Sepolia</b>
+              )}
+              {!isSepolia && (
+                <button
+                  className="btnSecondary"
+                  style={{ padding: "0 10px", marginLeft: 8, height: 34 }}
+                  onClick={switchToSepolia}
+                >
+                  Switch to Sepolia
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <button
+          className={`primaryCta ${account ? "" : "notBold"}`}
+          onClick={account ? buy : connect}
+          disabled={account ? !canMint : status === "sending"}
+        >
+          {account ? (status === "sending" ? "Confirming…" : "Mint") : "Log In to mint"}
+        </button>
+
+        <div className="noticeLock">
+          <span style={{ color: "rgb(var(--brand) / .90)" }}>🔒</span>
+          <span>Collection is locked from trading until all items have been minted.</span>
+        </div>
+
+        {txHash && (
+          <div className="txBox">
+            <div>
+              Tx: <span style={{ fontFamily: "var(--mono)" }}>{shortAddr(txHash)}</span>
+            </div>
+            <a href={`https://sepolia.etherscan.io/tx/${txHash}`} target="_blank" rel="noreferrer">
+              View on Etherscan →
+            </a>
+          </div>
+        )}
+
+        {error && <div className="err">{error}</div>}
+      </div>
+    </div>
+  );
+
+  // ===== Navbar render (strict per device) =====
+  const renderDesktop = () => (
+    <>
+      <div className="navLinks" aria-label="Primary navigation">
+        <span className="navLink">Play</span>
+        <span className="navLink">Trade</span>
+        <span className="navLink">Mint</span>
+      </div>
+
+      <div className="navSearch">
+        <div className="searchWrap" role="search">
+          <div className="searchLeft" aria-hidden="true">
+            <SearchIcon />
+          </div>
+          <input className="searchInput" placeholder="Search collections" />
+          <div className="searchRight" aria-hidden="true">
+            <div className="kbd">
+              <span className="kbdKey">Ctrl</span>
+              <span className="kbdKey">K</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="navRight">
+        <button className="btnSecondary">Buybacks</button>
+        <button className="btnSecondary">Rewards</button>
+        <button className="btnPrimary" onClick={connect}>
+          {account ? shortAddr(account) : "Log In"}
+        </button>
+      </div>
+    </>
+  );
+
+  const renderTablet = () => (
+    <>
+      {/* no Play/Trade/Mint in topbar */}
+      <div className="navSearch" style={{ paddingLeft: 12, paddingRight: 12 }}>
+        <div className="searchWrap" role="search">
+          <div className="searchLeft" aria-hidden="true">
+            <SearchIcon />
+          </div>
+          <input className="searchInput" placeholder="Search collections" />
+          {/* on tablet убираем Ctrl+K, чтобы не жрало место */}
+          <div className="searchRight" aria-hidden="true" style={{ paddingRight: 10, opacity: 0.0 }} />
+        </div>
+      </div>
+
+      <div className="navRight">
+        <button className="btnSecondary">Buybacks</button>
+        <button className="btnSecondary">Rewards</button>
+        <button className="btnPrimary" onClick={connect}>
+          {account ? shortAddr(account) : "Log In"}
+        </button>
+        <button className="iconBtn" onClick={() => setMenuOpen((v) => !v)} aria-label="Menu" title="Menu">
+          ☰
+        </button>
+      </div>
+    </>
+  );
+
+  const renderMobile = () => (
+    <>
+      {/* no links + no full search + no buybacks/rewards */}
+      <div className="navRight">
+        <button
+            className="iconGhost"
+            aria-label="Search"
+            title="Search"
+            onClick={() => setSearchRowOpen((v) => !v)}
+        >
+          <SearchIcon/>
+        </button>
+
+        <button className={`btnPrimary btnPrimaryMobile`} onClick={connect}>
+          {account ? shortAddr(account) : "Log In"}
+        </button>
+
+        <button
+          className="iconBtn iconBtnSmall"
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-label="Menu"
+          title="Menu"
+        >
+          ☰
+        </button>
+      </div>
+    </>
+  );
+
   return (
     <div className="page">
       <style>{CSS}</style>
@@ -962,84 +1367,55 @@ export default function App() {
               <a className="logoWrap" href="#" aria-label="Magic Eden">
                 <MagicEdenLogo />
               </a>
-
-              <div className="navLinks" aria-label="Primary navigation">
-                <span className="navLink">Play</span>
-                <span className="navLink">Trade</span>
-                <span className="navLink">Mint</span>
-              </div>
             </div>
 
-            <div className="navSearch">
-              <div className="searchWrap" role="search">
-                <div className="searchLeft" aria-hidden="true">
-                  <SearchIcon />
-                </div>
-                <input className="searchInput" placeholder="Search collections" />
-                <div className="searchRight" aria-hidden="true">
-                  <div className="kbd">
-                    <span className="kbdKey">Ctrl</span>
-                    <span className="kbdKey">K</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="navRight">
-              <button className="iconBtn mobileOnly" aria-label="Search">
-                <SearchIcon />
-              </button>
-
-              <div className="desktopOnly" style={{ gap: 10, display: "flex" }}>
-                <button className="btnSecondary">Buybacks</button>
-                <button className="btnSecondary">Rewards</button>
-              </div>
-
-              <button className="btnPrimary" onClick={connect}>
-                {account ? shortAddr(account) : "Log In"}
-              </button>
-
-              <button
-                className="iconBtn mobileOnly"
-                onClick={() => setMenuOpen((v) => !v)}
-                aria-label="Menu"
-                title="Menu"
-              >
-                ☰
-              </button>
-            </div>
+            {isDesktop && renderDesktop()}
+            {isTablet && renderTablet()}
+            {isMobile && renderMobile()}
           </nav>
         </header>
 
-        {menuOpen && (
+        {/* Mobile: search row toggled by icon */}
+        {isMobile && searchRowOpen && (
+          <div className="mobileSearchRow">
+            <div className="mobileSearchWrap">
+              <input className="mobileSearchInput" placeholder="Search collections (UI only)" />
+            </div>
+          </div>
+        )}
+
+        {/* Burger menu:
+            - Tablet: Play/Trade/Mint (и всё остальное)
+            - Mobile: Play/Trade/Mint + Buybacks/Rewards (потому что они скрыты сверху)
+        */}
+        {menuOpen && (isTablet || isMobile) && (
           <div className="mobileMenu">
             <button className="mobileItem">Play</button>
             <button className="mobileItem">Trade</button>
             <button className="mobileItem">Mint</button>
-            <button className="mobileItem">Buybacks</button>
-            <button className="mobileItem">Rewards</button>
+
+            {isMobile && (
+              <>
+                <button className="mobileItem">Buybacks</button>
+                <button className="mobileItem">Rewards</button>
+              </>
+            )}
           </div>
         )}
       </div>
 
       <div className="shell">
-        <div className="mainGrid" style={{ alignItems: "start" }}>
-          {/* LEFT TOP: title */}
-          <div className="topRow" style={{ margin: 0, justifyContent: "flex-start" }}>
-            <div className="topLeft">
-              <div className="chainBadge">ETH</div>
-              <div className="title">Meta Racing Pilots</div>
-            </div>
+        <div className="heroRow">
+          <div className="heroLeft">
+            <div className="chainBadge">ETH</div>
+            <div className="title">Meta Racing Pilots</div>
           </div>
 
-          {/* RIGHT TOP: Contract + icons */}
-          <div className="topRow" style={{ margin: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <button className="btnSecondary" style={{ height: 44, borderRadius: 10 }}>
-                Contract
-              </button>
-            </div>
-            <div style={{ display: "flex", gap: 12 }}>
+          <div className="heroRight">
+            <button className="btnSecondary" style={{ height: 44, borderRadius: 10 }}>
+              Contract
+            </button>
+            <div className="heroIcons">
               <button className="iconBtn" title="Website">
                 🌐
               </button>
@@ -1051,9 +1427,11 @@ export default function App() {
               </button>
             </div>
           </div>
+        </div>
 
-          {/* LEFT: media */}
-          <div className="mediaCard" style={{ marginTop: 6 }}>
+        <div className="mainGrid">
+          {/* LEFT */}
+          <div className="mediaCard">
             <div className="mediaWrap">
               <div className="mediaMain">
                 <img src={IMAGES[activeThumb]} alt="Preview" className="mainImg" />
@@ -1076,157 +1454,153 @@ export default function App() {
                 ))}
               </div>
             </div>
-          </div>
 
-          {/* RIGHT: panel */}
-          <div className="rightCol" style={{ marginTop: 6 }}>
-            <div className="panel">
-              <div className="panelInner">
-                <div className="metaRow">
-                  <div className="metaLeft">
-                    <div className="metaLine">
-                      <div className="eligPill">
-                        {!eligible && <span className="lockIcon">🔒</span>}
-                        {eligible ? "Eligible" : "Not Eligible"}
+            {/* MOBILE: после картинок идет mint */}
+            <div className="mintMobile">
+              <MintPanel mobile />
+            </div>
+
+            {/* DESCRIPTION */}
+            <div className="descWrap">
+              <div className="layerBox">
+                <div className="layerBoxInner">
+                  <div className="sectionTitle">Overview</div>
+
+                  <p className="p">
+                    Meta Racing Pilots is a playable PFP NFT collection where each Pilot defines race strategy and
+                    enhances car performance. A Pilot is a necessary asset for entering races and plays a key role in
+                    determining the outcome of every competition.
+                  </p>
+
+                  <p className="p">
+                    <span className="brandStrong">The Role of Pilots in Gameplay</span>
+                  </p>
+
+                  <p className="p">In Meta Racing, the Pilot acts as the strategic core of each race:</p>
+                  <ol className="list">
+                    <li className="li">Determines strategic buffs and performance boosts during races</li>
+                    <li className="li">Significantly influences the car’s overall performance</li>
+                    <li className="li">Required to participate in any race</li>
+                  </ol>
+
+                  <p className="p">Without a Pilot, cars cannot enter the track, making each Pilot essential to gameplay.</p>
+
+                  <p className="p">
+                    <span className="brandStrong">RPG Progression &amp; Custom Builds</span>
+                  </p>
+
+                  <p className="p">Every Pilot is unique and develops through an RPG-style progression system:</p>
+                  <ol className="list">
+                    <li className="li">Free allocation of skill points to create custom builds</li>
+                    <li className="li">Multiple strategic paths depending on playstyle</li>
+                    <li className="li">Progression through races or a dedicated in-game academy</li>
+                  </ol>
+
+                  <p className="p">
+                    Pilot rarity defines starting attributes and the maximum progression cap, giving each Pilot a distinct
+                    long-term gameplay role.
+                  </p>
+
+                  <p className="p">
+                    <span className="brandStrong">Flexible Usage &amp; Team Play</span>
+                  </p>
+
+                  <p className="p">Pilots can be used in multiple ways within the Meta Racing ecosystem:</p>
+                  <ol className="list">
+                    <li className="li">Actively race and develop Pilots through gameplay</li>
+                    <li className="li">Build balanced teams for different race formats</li>
+                    <li className="li">Make Pilots available to other players when not in use</li>
+                  </ol>
+
+                  <p className="p">This flexibility supports a dynamic and evolving in-game environment.</p>
+
+                  <p className="p">
+                    <span className="brandStrong">The Meta Racing Ecosystem</span>
+                  </p>
+
+                  <p className="p">
+                    The Meta Racing Pilots collection is built on The chain Solana and is available on an NFT marketplace,
+                    enabling fast transactions and easy access. Minting a Pilot is the first step toward shaping your racing
+                    strategy, developing your team, and progressing in the competitive world of Meta Racing.
+                  </p>
+
+                  <div className="h3">Utility</div>
+                  <ol className="list">
+                    <li className="li">
+                      <span className="brandStrong">Necessary Gameplay Asset:</span> A Pilot is required to enter any race in
+                      Meta Racing and earn in races and tournaments
+                    </li>
+                    <li className="li">
+                      <span className="brandStrong">Performance Boosts:</span> Pilots provide in-race buffs and attribute
+                      modifiers that directly affect car performance and races outcomes.
+                    </li>
+                    <li className="li">
+                      <span className="brandStrong">RPG-Style Progression System:</span> Each Pilot can be upgraded with players
+                      freely allocating skill points to create custom builds and strategies.
+                    </li>
+                    <li className="li">
+                      <span className="brandStrong">Rarity-Based Progression Depth:</span> Pilot rarity defines starting
+                      attributes and the maximum progression cap
+                    </li>
+                    <li className="li">
+                      <span className="brandStrong">Team &amp; Roster Building:</span> Players can assemble balanced teams of
+                      Pilots optimized for different tracks, race formats, and strategic scenarios.
+                    </li>
+                    <li className="li">
+                      <span className="brandStrong">Passive Utility via Rental:</span> When not actively racing, Pilots can be
+                      made available for use by other players, allowing owners to receive in-game token rewards.
+                    </li>
+                    <li className="li">
+                      <span className="brandStrong">3+ NFT Pilots Holders:</span> 3+ NFT Pilots Holders will receive a free Car
+                      NFT on the game release.
+                    </li>
+                    <li className="li">
+                      <span className="brandStrong">PFP:</span> Pilots are cool pfp and community NFT
+                    </li>
+                  </ol>
+
+                  <div className="divider" />
+
+                  <div className="sectionTitle">Meet the team</div>
+                  <div className="teamGrid">
+                    {TEAM.map((m) => (
+                      <div key={m.name} className="teamCard">
+                        <div className="teamImgWrap">
+                          <img className="teamImg" src={m.img} alt={`${m.name} image`} />
+                        </div>
+                        <div className="teamBody">
+                          <div>
+                            <div className="teamName">{m.name}</div>
+                            <div className="teamRole">{m.role}</div>
+                          </div>
+                          <div className="teamLinks">
+                            {m.x ? (
+                              <a
+                                className="xLink"
+                                href={m.x}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={`${m.name} on X`}
+                                title="X"
+                              >
+                                <XIcon />
+                              </a>
+                            ) : (
+                              <span style={{ height: 18 }} />
+                            )}
+                          </div>
+                        </div>
                       </div>
-
-                      <div className="publicRow">
-                        <span className="greenDot" />
-                        <span>Public</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mintedBox">
-                    <div className="mintedHeader">
-                      <div className="mintedTop">Total minted</div>
-                      <div className="mintedNums">
-                        {TOTAL_MINTED_PERCENT}%&nbsp;&nbsp; {TOTAL_MINTED} / {TOTAL_SUPPLY}
-                      </div>
-                    </div>
-
-                    <div
-                      className="mintedBar"
-                      aria-label="minted progress"
-                      style={{ ["--pct"]: `${TOTAL_MINTED_PERCENT}%` }}
-                    >
-                      <div className="mintedFill" />
-                    </div>
+                    ))}
                   </div>
                 </div>
-
-                <div className="rowTop">
-                  <div className="priceBlock">
-                    <div className="label">Price</div>
-                    <div className="priceLine">
-                      <div className="priceBig">{PRICE_PER_ITEM_ETH} ETH</div>
-                      <div className="usd">(test)</div>
-                    </div>
-                  </div>
-
-                  <div className="stepper">
-                    <button
-                      className="stepBtn"
-                      onClick={() => setQty((v) => Math.max(1, Number(v) - 1))}
-                      disabled={qty <= 1}
-                      aria-label="decrease"
-                    >
-                      −
-                    </button>
-                    <div className="stepVal">{qty}</div>
-                    <button
-                      className="stepBtn"
-                      onClick={() => setQty((v) => Math.min(20, Number(v) + 1))}
-                      disabled={qty >= 20}
-                      aria-label="increase"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                <div className="fees">
-                  <div>Mint fee</div>
-                  <div className="r">{mintFeeEth} ETH</div>
-
-                  <div>Protocol fee</div>
-                  <div className="r">{protocolFeeEth} ETH</div>
-
-                  <div>
-                    Priority fee <span className="smallLink">(Standard)</span>
-                  </div>
-                  <div className="r">—</div>
-
-                  <div style={{ marginTop: 6, color: "rgb(var(--textColor-secondary) / .85)" }}>
-                    Subtotal
-                  </div>
-                  <div style={{ marginTop: 6 }} className="r">
-                    {formatEther(totalWei)} ETH
-                  </div>
-                </div>
-
-                <div className="terms">
-                  <input
-                    className="cb"
-                    type="checkbox"
-                    checked={accepted}
-                    onChange={(e) => setAccepted(e.target.checked)}
-                  />
-                  <div>
-                    By clicking "mint", you agree to the Magic Eden Terms of Service.
-                    <div style={{ marginTop: 6, color: "rgb(var(--textColor-secondary) / .85)" }}>
-                      Network:{" "}
-                      {isSepolia ? (
-                        <b style={{ color: "rgb(var(--textColor-primary) / .92)" }}>Sepolia</b>
-                      ) : (
-                        <b style={{ color: "rgb(var(--textColor-attention))" }}>
-                          Wrong / Not Sepolia
-                        </b>
-                      )}
-                      {!isSepolia && (
-                        <button
-                          className="btnSecondary"
-                          style={{ padding: "0 10px", marginLeft: 8, height: 34 }}
-                          onClick={switchToSepolia}
-                        >
-                          Switch to Sepolia
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  className={`primaryCta ${account ? "" : "notBold"}`}
-                  onClick={account ? buy : connect}
-                  disabled={account ? !canMint : status === "sending"}
-                >
-                  {account ? (status === "sending" ? "Confirming…" : "Mint") : "Log In to mint"}
-                </button>
-
-                <div className="noticeLock">
-                  <span style={{ color: "rgb(var(--brand) / .90)" }}>🔒</span>
-                  <span>Collection is locked from trading until all items have been minted.</span>
-                </div>
-
-                {txHash && (
-                  <div className="txBox">
-                    <div>
-                      Tx: <span style={{ fontFamily: "var(--mono)" }}>{shortAddr(txHash)}</span>
-                    </div>
-                    <a
-                      href={`https://sepolia.etherscan.io/tx/${txHash}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      View on Etherscan →
-                    </a>
-                  </div>
-                )}
-
-                {error && <div className="err">{error}</div>}
               </div>
             </div>
+          </div>
+
+          {/* RIGHT (desktop mint panel) */}
+          <div className="rightCol mintDesktop">
+            <MintPanel />
           </div>
         </div>
       </div>
